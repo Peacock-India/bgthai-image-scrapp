@@ -52,6 +52,47 @@ async function downloadImageById(imageId) {
   }
 }
 
-// For example, pass the imageId as a command-line argument or hard-code it here.
-const imageId = process.argv[2] || "1OOyqSwTp0Ihxl9TML__sZ7erALfLbIRX";
-downloadImageById(imageId);
+/**
+ * Reads image IDs from a text file (one image ID per line).
+ *
+ * @param {string} filePath - The path to the text file.
+ * @returns {string[]} Array of image IDs.
+ */
+function readImageIds(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    // Split by newline and filter out any empty lines
+    return content.split(/\r?\n/).filter(id => id.trim() !== '');
+  } catch (error) {
+    console.error(`Error reading image IDs from ${filePath}:`, error.message);
+    return [];
+  }
+}
+
+/**
+ * Main function to read image IDs from image_ids.txt and download all images.
+ */
+async function main() {
+  // Define the path to the image IDs file.
+  const imageIdsFilePath = path.join(__dirname, 'image_ids.txt');
+
+  // Read image IDs from the file.
+  const imageIds = readImageIds(imageIdsFilePath);
+  if (imageIds.length === 0) {
+    console.error('No image IDs found.');
+    return;
+  }
+
+  console.log(`Found ${imageIds.length} image IDs. Starting downloads...`);
+
+  // Sequentially download each image.
+  for (const id of imageIds) {
+    console.log(`Downloading image with ID: ${id}`);
+    await downloadImageById(id);
+  }
+
+  console.log('All downloads completed.');
+}
+
+// Execute the main function.
+main().catch(error => console.error('Error in main execution:', error));
