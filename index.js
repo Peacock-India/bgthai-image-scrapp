@@ -98,8 +98,8 @@ async function downloadImage(fileObj, lang) {
     // Convert base64 string into a binary buffer.
     const imageBuffer = Buffer.from(base64Data, 'base64');
 
-    // Build the local destination folder: images/<lang>/<relativePath>
-    const destFolder = path.join(__dirname, 'images', lang, relativePath);
+    // Build the local destination folder: images_2/<lang>/<relativePath>
+    const destFolder = path.join(__dirname, 'images_2', lang, relativePath);
     // Ensure the destination folder exists.
     if (!fs.existsSync(destFolder)) {
       fs.mkdirSync(destFolder, { recursive: true });
