@@ -9,9 +9,11 @@ const path = require('path');
 const OWNER = 'bgthai';
 const REPO = 'bgthai.github.io';
 // Starting path in the repo (change if needed)
-const START_PATH = 'quotes/en';
+// const START_PATH = 'quotes/en';
+const START_PATH = 'quotes/th';
 // Output file to save image IDs
-const OUTPUT_FILE = path.join(__dirname, 'image_ids.txt');
+// const OUTPUT_FILE = path.join(__dirname, 'image_ids.txt');
+const OUTPUT_FILE = path.join(__dirname, 'th_image_ids.txt');
 
 // GitHub API base URL
 const GITHUB_API_BASE = 'https://api.github.com/repos';
