@@ -74,7 +74,8 @@ function readImageIds(filePath) {
  */
 async function main() {
   // Define the path to the image IDs file.
-  const imageIdsFilePath = path.join(__dirname, 'image_ids.txt');
+  // const imageIdsFilePath = path.join(__dirname, 'image_ids.txt');
+  const imageIdsFilePath = path.join(__dirname, 'th_image_ids.txt');
 
   // Read image IDs from the file.
   const imageIds = readImageIds(imageIdsFilePath);
