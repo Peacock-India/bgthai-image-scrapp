@@ -7,12 +7,11 @@ const path = require('path');
 
 /**
  * Downloads an image from the Google Apps Script endpoint using the provided imageId,
- * then saves it in the specified language folder (e.g. images/en or images/th) with a filename based on the imageId.
+ * then saves it in the /images folder with a filename based on the imageId.
  *
  * @param {string} imageId - The unique image identifier.
- * @param {string} lang - The language folder name ('en' or 'th').
  */
-async function downloadImageById(imageId, lang) {
+async function downloadImageById(imageId) {
   // Construct the Google Apps Script URL by including the imageId as a query parameter.
   const scriptUrl = `https://script.google.com/macros/s/AKfycbyOrx1xd10IG-VpZAF4HUOIA3wk0YkJa0IRVgNtbFBLrcHmA55eYTMWbsGwPHW1O5yiEQ/exec?id=${imageId}`;
 
@@ -34,20 +33,20 @@ async function downloadImageById(imageId, lang) {
     // Convert the base64-encoded string into a binary buffer.
     const imageBuffer = Buffer.from(base64Data, 'base64');
 
-    // Define the language-specific images folder path (e.g., images/en or images/th).
-    const langDir = path.join(__dirname, 'images', lang);
+    // Define the images folder path (relative to the current script).
+    const imagesDir = path.join(__dirname, 'images');
 
-    // Ensure the language-specific images directory exists; if not, create it.
-    if (!fs.existsSync(langDir)) {
-      fs.mkdirSync(langDir, { recursive: true });
+    // Ensure the images directory exists; if not, create it.
+    if (!fs.existsSync(imagesDir)) {
+      fs.mkdirSync(imagesDir, { recursive: true });
     }
 
     // Construct the full file path for the saved image.
-    const outputFilePath = path.join(langDir, `${imageId}.jpg`);
+    const outputFilePath = path.join(imagesDir, `${imageId}.jpg`);
 
     // Write the binary image buffer to the file.
     fs.writeFileSync(outputFilePath, imageBuffer);
-    console.log(`Image ${imageId} saved as ${outputFilePath}`);
+    console.log(`Image saved as ${outputFilePath}`);
   } catch (error) {
     console.error(`Error downloading image with id ${imageId}:`, error.message);
   }
@@ -71,31 +70,26 @@ function readImageIds(filePath) {
 }
 
 /**
- * Main function that reads image IDs for both languages and downloads all images.
+ * Main function to read image IDs from image_ids.txt and download all images.
  */
 async function main() {
-  // Define file paths for English and Thai image IDs.
-  const enIdsFilePath = path.join(__dirname, 'image_ids.txt');      // English
-  const thIdsFilePath = path.join(__dirname, 'th_image_ids.txt');     // Thai
+  // Define the path to the image IDs file.
+  // const imageIdsFilePath = path.join(__dirname, 'image_ids.txt');
+  const imageIdsFilePath = path.join(__dirname, 'th_image_ids.txt');
 
-  // Read image IDs from the files.
-  const enImageIds = readImageIds(enIdsFilePath);
-  const thImageIds = readImageIds(thIdsFilePath);
-
-  console.log(`Found ${enImageIds.length} English image IDs and ${thImageIds.length} Thai image IDs.`);
-  
-  // Download English images
-  console.log('Downloading English images...');
-  for (const id of enImageIds) {
-    console.log(`Downloading English image: ${id}`);
-    await downloadImageById(id, 'en');
+  // Read image IDs from the file.
+  const imageIds = readImageIds(imageIdsFilePath);
+  if (imageIds.length === 0) {
+    console.error('No image IDs found.');
+    return;
   }
 
-  // Download Thai images
-  console.log('Downloading Thai images...');
-  for (const id of thImageIds) {
-    console.log(`Downloading Thai image: ${id}`);
-    await downloadImageById(id, 'th');
+  console.log(`Found ${imageIds.length} image IDs. Starting downloads...`);
+
+  // Sequentially download each image.
+  for (const id of imageIds) {
+    console.log(`Downloading image with ID: ${id}`);
+    await downloadImageById(id);
   }
 
   console.log('All downloads completed.');
